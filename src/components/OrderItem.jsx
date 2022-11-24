@@ -14,7 +14,7 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
   useEffect(() =>{
     fetchingData()    
     setEditDesc(singleOrder.orderDescription)
-  },[edit,singleOrder.orderDescription,fetchingData])
+  },[edit])
 
   //to handle deleting an order
   const handleDelete = async () => {
