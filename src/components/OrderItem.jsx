@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Swal from "sweetalert2";
-import { DeleteOrder, EditOrder } from "../Api";
+import { DeleteOrder, EditOrder } from "../Api/Api";
 
-const OrderItem = ({ singleOrder, fetchingData }) => {
+const OrderItem = ({ singleOrder, fetchingData}) => {
   const [edit, SetEdit] = useState(false);
   const [editDesc, setEditDesc] = useState(singleOrder.orderDescription);
 
@@ -10,6 +10,13 @@ const OrderItem = ({ singleOrder, fetchingData }) => {
     SetEdit(!edit);
   };
 
+  //it will listen to the edit state and we will have the latest changed values to display
+  useEffect(() =>{
+    fetchingData()    
+    setEditDesc(singleOrder.orderDescription)
+  },[edit])
+
+  //to handle deleting an order
   const handleDelete = async () => {
     Swal.fire({
       title: "Are you sure you want to delete this order?",
@@ -31,7 +38,7 @@ const OrderItem = ({ singleOrder, fetchingData }) => {
             showConfirmButton: false,
             timer: 1500,
           }).then(() => {
-            fetchingData();
+            fetchingData();            
             SetEdit(false);
           });
         } else {
@@ -48,6 +55,7 @@ const OrderItem = ({ singleOrder, fetchingData }) => {
     });
   };
 
+  //to save the edited order description
   const handleSaveEdit = async () => {
     if (editDesc.length > 0) {
       const res = await EditOrder(
@@ -64,6 +72,8 @@ const OrderItem = ({ singleOrder, fetchingData }) => {
           timer: 1500,
         }).then(() => {
           fetchingData();
+          ;
+          setEditDesc(singleOrder.orderDescription)
           SetEdit(false);
         });
       } else {
@@ -84,6 +94,8 @@ const OrderItem = ({ singleOrder, fetchingData }) => {
         showConfirmButton: false,
         timer: 2000,
       }).then(() => {
+        fetchingData()
+        ;
         setEditDesc(singleOrder.orderDescription);
         SetEdit(false);
       });

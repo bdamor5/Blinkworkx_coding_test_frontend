@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import useOnClickOutside from "use-onclickoutside";
-import { GetAllOrders, GetAllProducts } from "./Api";
+import { GetAllOrders, GetAllProducts } from "./Api/Api";
 import Modal from "./components/Modal";
 import OrderItem from "./components/OrderItem";
 
@@ -13,6 +13,7 @@ const App = () => {
   const [filter, setFilter] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
 
+  //on component mount , we will fetch our orders & products data
   useEffect(() => {
     fetchingData();
   }, []);
@@ -26,9 +27,10 @@ const App = () => {
     setAllProducts(products);
   };
 
+  //handle function for filtering order rows based on order id & order description
   const handleFilter = (filterValue) => {
-    console.log(filterValue);
-    if (filterValue.length > 0) {
+    // console.log(filterValue);
+    if (filterValue?.length > 0) {
       let temp = allOrders.filter((curr) =>
         curr.Id.toString().includes(filterValue) ||
         curr.orderDescription.toString().includes(filterValue)
@@ -36,7 +38,7 @@ const App = () => {
           : null
       );
 
-      console.log(temp);
+      // console.log(temp);
 
       setFilteredOrders(temp);
     } else {
@@ -44,6 +46,7 @@ const App = () => {
     }
   };
 
+  //using third party package to detect a click outside the modal to close it
   useOnClickOutside(wrapperRef, () => showModal && setShowModal(false));
 
   return (
@@ -98,6 +101,7 @@ const App = () => {
                       <OrderItem
                         singleOrder={singleOrder}
                         fetchingData={fetchingData}
+                        handleFilter={handleFilter}
                       />
                     ))
                   ) : filter.length > 0 ? (

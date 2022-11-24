@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import ProductItem from "./ProductItem";
 import Swal from "sweetalert2";
-import { AddOrder,GetAllOrders } from "../Api";
+import { AddOrder,GetAllOrders } from "../Api/Api";
 
 const Modal = ({
   wrapperRef,
@@ -13,6 +13,7 @@ const Modal = ({
   const [addedProducts, setAddedProducts] = useState([]);
   const [orderDesc, setOrderDesc] = useState("");
 
+  //this function will handle those checked products
   const selectedProducts = (index, checked) => {
     let temp1 = addedProducts;
 
@@ -28,6 +29,7 @@ const Modal = ({
     setAddedProducts(temp1);
   };
 
+  //to add new order
   const handleSubmit = async () => {
     if (addedProducts.length > 0 && orderDesc.length > 0) {
       const res = await AddOrder({ orderDescription:orderDesc, addedProducts });

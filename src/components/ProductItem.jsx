@@ -10,6 +10,7 @@ const ProductItem = ({
 }) => {
   const [check, setCheck] = useState(true);
 
+  //passing the product to selectedProducts function which got checked/selected
   const handleOnChange = (index) => {
     setCheck(!check);
 
