@@ -1,8 +1,10 @@
 import axios from "axios";
 
+const url = 'https://blinkwworkx-project-backend.onrender.com/'
+
 export const GetAllOrders = async () => {
   try {
-    const res = await axios.get("http://localhost:4000/api/order");
+    const res = await axios.get(`${url}api/order`);
     // console.log(res.data);
 
     return res.data;
@@ -13,7 +15,7 @@ export const GetAllOrders = async () => {
 
 export const GetAllProducts = async () => {
   try {
-    const res = await axios.get("http://localhost:4000/api/product");
+    const res = await axios.get(`${url}api/product`);
     // console.log(res.data);
 
     return res.data;
@@ -24,7 +26,7 @@ export const GetAllProducts = async () => {
 
 export const AddOrder = async (data) => {
   try {
-    const res = await axios.post("http://localhost:4000/api/order", data, {
+    await axios.post(`${url}api/order`, data, {
       "Content-Type": "application/json",
     });
     // console.log(res.data);
@@ -37,7 +39,7 @@ export const AddOrder = async (data) => {
 
 export const EditOrder = async (data, id) => {
   try {
-    const res = await axios.put(`http://localhost:4000/api/order/${id}`, data, {
+    await axios.put(`${url}api/order/${id}`, data, {
       "Content-Type": "application/json",
     });
     // console.log(res.data);
@@ -50,7 +52,7 @@ export const EditOrder = async (data, id) => {
 
 export const DeleteOrder = async (id) => {
   try {
-    const res = await axios.delete(`http://localhost:4000/api/order/${id}`);
+    await axios.delete(`${url}api/order/${id}`);
 
     return true;
   } catch (error) {
