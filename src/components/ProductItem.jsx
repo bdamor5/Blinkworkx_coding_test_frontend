@@ -6,7 +6,7 @@ const ProductItem = ({
   desc,
   index,
   allProducts,
-  selectedProducts,
+  selectedProducts
 }) => {
   const [check, setCheck] = useState(true);
 
@@ -14,7 +14,7 @@ const ProductItem = ({
   const handleOnChange = (index) => {
     setCheck(!check);
 
-    selectedProducts(index,check)
+    selectedProducts(allProducts[index],check)
   };
 
   return (

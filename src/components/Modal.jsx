@@ -8,24 +8,28 @@ const Modal = ({
   wrapperRef,
   setShowModal,
   allProducts ,
-  fetchingData
+  setFilteredOrders
 }) => {
   const [addedProducts, setAddedProducts] = useState([]);
   const [orderDesc, setOrderDesc] = useState("");
 
   //this function will handle those checked products
-  const selectedProducts = (index, checked) => {
+  const selectedProducts = (product, checked) => {
+    // console.log(product)
     let temp1 = addedProducts;
 
     if (checked) {
-      temp1.push(index);
+      temp1.push(product.Id);
     } else {
       let temp2 = [];
 
-      temp2 = temp1.filter((curr) => curr !== index);
+      temp2 = temp1.filter((curr) => curr !== product.Id);
 
       temp1 = temp2;
     }
+
+    // console.log(temp1)
+
     setAddedProducts(temp1);
   };
 
@@ -35,16 +39,19 @@ const Modal = ({
       const res = await AddOrder({ orderDescription:orderDesc, addedProducts });
 
       if (res) {
+        setShowModal(false);
+
         Swal.fire({
           position: "top-center",
           icon: "success",
           title: "Order Placed!",
           showConfirmButton: false,
           timer: 1500,
-        }).then(() => {
-          GetAllOrders();
-          fetchingData();
-          setShowModal(false);
+        }).then(async() => {
+          let newOrders = await GetAllOrders()
+          // console.log(newOrders)
+          setFilteredOrders(newOrders);
+          
         });
       } else {
         Swal.fire({
@@ -54,7 +61,6 @@ const Modal = ({
           showConfirmButton: false,
           timer: 1500,
         });
-        setShowModal(false);
       }
     } else {
       setShowModal(true);

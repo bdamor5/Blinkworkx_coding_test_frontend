@@ -1,20 +1,20 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { DeleteOrder, EditOrder } from "../Api/Api";
+import { DeleteOrder, EditOrder, GetAllOrders } from "../Api/Api";
 
-const OrderItem = ({ singleOrder, fetchingData}) => {
+const OrderItem = ({ singleOrder, setFilteredOrders }) => {
   const [edit, SetEdit] = useState(false);
   const [editDesc, setEditDesc] = useState(singleOrder.orderDescription);
+  const [enableEdit, setEnableEdit] = useState(false);
 
   const handleEdit = () => {
     SetEdit(!edit);
   };
 
   //it will listen to the edit state and we will have the latest changed values to display
-  useEffect(() =>{
-    fetchingData()    
-    setEditDesc(singleOrder.orderDescription)
-  },[edit])
+  useEffect(() => {
+    setEditDesc(singleOrder.orderDescription);
+  }, [edit]);
 
   //to handle deleting an order
   const handleDelete = async () => {
@@ -37,8 +37,9 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
             title: "Order Deleted!",
             showConfirmButton: false,
             timer: 1500,
-          }).then(() => {
-            fetchingData();            
+          }).then(async () => {
+            let newOrders = await GetAllOrders();
+            setFilteredOrders(newOrders);
             SetEdit(false);
           });
         } else {
@@ -64,17 +65,19 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
       );
 
       if (res) {
+        SetEdit(false);
+
         Swal.fire({
           position: "top-center",
           icon: "success",
           title: "Edited Order Saved!",
           showConfirmButton: false,
           timer: 1500,
-        }).then(() => {
-          fetchingData();
-          ;
-          setEditDesc(singleOrder.orderDescription)
-          SetEdit(false);
+        }).then(async () => {
+          setEnableEdit(false);
+          setEditDesc(singleOrder.orderDescription);
+          let newOrders = await GetAllOrders();
+          setFilteredOrders(newOrders);
         });
       } else {
         Swal.fire({
@@ -84,7 +87,7 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
           showConfirmButton: false,
           timer: 1500,
         });
-        SetEdit(false);
+        setEnableEdit(false);
       }
     } else {
       Swal.fire({
@@ -94,8 +97,6 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
         showConfirmButton: false,
         timer: 2000,
       }).then(() => {
-        fetchingData()
-        ;
         setEditDesc(singleOrder.orderDescription);
         SetEdit(false);
       });
@@ -103,7 +104,14 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
   };
 
   //converting JSON string into an array and removing extra chars from that array
-  let productsLength = [...singleOrder.productIdArray].filter((curr) => curr !== "[" && curr !== "," && curr !== "]" ? curr : null)
+  let productsLength = [...singleOrder.productIdArray].filter((curr) => {
+    // console.log(curr);
+    return (curr !== "[" && curr !== "," && curr !== "]") || curr === 0
+      ? curr
+      : null;
+  });
+
+  // console.log(singleOrder.productIdArray, productsLength);
 
   return (
     <tr className="border-b border-x-2">
@@ -114,9 +122,12 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
         {edit ? (
           <>
             <input
-              className="border-2 px-1"
+              className="border-2 px-1 border-black rounded"
               value={editDesc}
-              onChange={(e) => setEditDesc(e.target.value)}
+              onChange={(e) => {
+                setEditDesc(e.target.value);
+                setEnableEdit(true);
+              }}
               type="text"
             />
           </>
@@ -124,15 +135,20 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
           singleOrder.orderDescription
         )}
       </td>
-      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+      <td className="text-sm text-gray-900 font-light py-4 whitespace-nowrap pl-10">
         {productsLength.length}
       </td>
       <td className="text-sm text-gray-900 font-light px-3 py-4 whitespace-nowrap flex justify-around items-center">
         {edit ? (
           <>
-            <span title="Save Edit" onClick={handleSaveEdit}>
+            <span
+              title="Save Edit"
+              onClick={() => enableEdit && handleSaveEdit()}
+            >
               <svg
-                className="w-6 mt-1 cursor-pointer bg-green-500 p-1 text-white rounded shadow"
+                className={`w-6 mt-0 cursor-pointer p-1 text-white rounded shadow ${
+                  enableEdit ? "bg-green-500" : "bg-slate-400"
+                }`}
                 viewBox="0 0 24 24"
               >
                 <path
@@ -149,9 +165,12 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
               className="md:mx-3"
             >
               <svg
-                className="w-6 mt-1 cursor-pointer bg-red-500 p-1 text-white rounded shadow"
+                className="w-6 mt-0 cursor-pointer bg-red-500 p-1 text-white rounded shadow"
                 viewBox="0 0 24 24"
-                onClick={() => SetEdit(false)}
+                onClick={() => {
+                  SetEdit(false);
+                  setEnableEdit(false);
+                }}
               >
                 <path
                   fill="currentColor"
@@ -163,7 +182,7 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
         ) : (
           <span title="Edit Order">
             <svg
-              className="w-6 mt-1 cursor-pointer bg-yellow-500 p-1 text-white rounded shadow md:mr-3"
+              className="w-6 mt-0 cursor-pointer bg-yellow-500 p-1 text-white rounded shadow md:mr-3 "
               viewBox="0 0 24 24"
               onClick={handleEdit}
             >
@@ -176,7 +195,7 @@ const OrderItem = ({ singleOrder, fetchingData}) => {
         )}
         <span title="Delete order">
           <svg
-            className="w-6 cursor-pointer bg-blue-500 p-1 text-white rounded shadow mt-1"
+            className="w-6 cursor-pointer bg-blue-500 p-1 text-white rounded shadow mt-0"
             viewBox="0 0 24 24"
             onClick={handleDelete}
           >

@@ -15,17 +15,24 @@ const App = () => {
 
   //on component mount , we will fetch our orders & products data
   useEffect(() => {
-    fetchingData();
+    const fetchingData = async () => {
+      const orders = await GetAllOrders();
+      const products = await GetAllProducts();
+  
+      setAllOrders(orders);
+      setFilteredOrders(orders);
+
+      setAllProducts(products);
+      // console.log('run')
+  
+      return {orders,products}
+    };
+   fetchingData();
+  //  console.log(data)
+
   }, []);
 
-  const fetchingData = async () => {
-    const orders = await GetAllOrders();
-    const products = await GetAllProducts();
-
-    setAllOrders(orders);
-    setFilteredOrders(orders);
-    setAllProducts(products);
-  };
+  
 
   //handle function for filtering order rows based on order id & order description
   const handleFilter = (filterValue) => {
@@ -33,7 +40,7 @@ const App = () => {
     if (filterValue?.length > 0) {
       let temp = allOrders.filter((curr) =>
         curr.Id.toString().includes(filterValue) ||
-        curr.orderDescription.toString().includes(filterValue)
+        curr.orderDescription.toString().includes(filterValue.toLowerCase())
           ? curr
           : null
       );
@@ -73,19 +80,19 @@ const App = () => {
                   <tr className="border-x-2 border-t-2">
                     <th
                       scope="col"
-                      className="text-sm font-medium text-gray-900 px-5 py-4 text-left"
+                      className="text-sm font-medium text-gray-900 px-5 py-4 text-left sm:text-xs sm:text-center"
                     >
                       Order Id
                     </th>
                     <th
                       scope="col"
-                      className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                      className="text-sm font-medium text-gray-900 px-6 py-4 text-left sm:text-xs"
                     >
                       Order description
                     </th>
                     <th
                       scope="col"
-                      className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                      className="text-sm font-medium text-gray-900 px-6 py-4 text-left sm:text-xs sm:text-center"
                     >
                       Counts of Products
                     </th>
@@ -96,12 +103,12 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredOrders.length ? (
-                    filteredOrders.map((singleOrder) => (
+                  {filteredOrders?.length ? (
+                    filteredOrders.map((singleOrder,index) => (
                       <OrderItem
                         singleOrder={singleOrder}
-                        fetchingData={fetchingData}
-                        handleFilter={handleFilter}
+                        key={index}
+                        setFilteredOrders={setFilteredOrders}
                       />
                     ))
                   ) : filter.length > 0 ? (
@@ -148,7 +155,7 @@ const App = () => {
               wrapperRef={wrapperRef}
               setShowModal={setShowModal}
               allProducts={allProducts}
-              fetchingData={fetchingData}
+              setFilteredOrders={setFilteredOrders}
             />
           </>
         ) : null}
